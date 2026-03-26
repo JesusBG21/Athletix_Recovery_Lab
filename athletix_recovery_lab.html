@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Athletix Recovery Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --surface: #11141c;
+  --card: #181c27;
+  --card2: #1e2330;
+  --accent: #e8ff3c;
+  --accent2: #3cffe8;
+  --danger: #ff4d4d;
+  --warning: #ffaa00;
+  --success: #4dff91;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --border: #252a38;
+  --border2: #2e3447;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+/* GRID BG */
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image: linear-gradient(rgba(232,255,60,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(232,255,60,0.02) 1px,transparent 1px);
+  background-size:48px 48px; pointer-events:none; z-index:0;
+}
+
+/* PAGES */
+.page { display:none; min-height:100vh; position:relative; z-index:1; }
+.page.active { display:flex; }
+
+/* ===== LOGIN ===== */
+#page-login {
+  align-items:center; justify-content:center;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,255,60,0.06) 0%, transparent 70%);
+}
+.login-box { width:100%; max-width:420px; padding:24px; }
+.login-logo { font-family:'Bebas Neue',sans-serif; font-size:42px; letter-spacing:3px; line-height:1; margin-bottom:4px; }
+.login-logo span { color:var(--accent); }
+.login-sub { font-size:12px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:40px; }
+.login-card { background:var(--card); border:1px solid var(--border2); padding:32px; }
+.login-title { font-size:18px; font-weight:600; margin-bottom:24px; }
+.form-group { margin-bottom:18px; }
+.form-label { font-size:11px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px; display:block; }
+.form-input { width:100%; background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; padding:12px 14px; outline:none; transition:border-color .2s; }
+.form-input:focus { border-color:var(--accent); }
+.form-input::placeholder { color:var(--muted); }
+.role-tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px; }
+.role-tab { background:var(--surface); border:1px solid var(--border2); color:var(--muted); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; padding:10px; cursor:pointer; transition:all .2s; }
+.role-tab.active { background:rgba(232,255,60,0.1); border-color:var(--accent); color:var(--accent); }
+.btn-primary { width:100%; background:var(--accent); color:#0a0c10; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; letter-spacing:1px; padding:14px; border:none; cursor:pointer; transition:opacity .2s; text-transform:uppercase; }
+.btn-primary:hover { opacity:.85; }
+.demo-hint { font-size:11px; color:var(--muted); text-align:center; margin-top:16px; line-height:1.6; }
+.demo-hint strong { color:var(--text); }
+
+/* ===== APP LAYOUT ===== */
+#page-app { flex-direction:row; }
+.sidebar { width:240px; min-height:100vh; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; position:sticky; top:0; height:100vh; }
+.sidebar-logo { padding:24px 20px; border-bottom:1px solid var(--border); }
+.sidebar-logo .logo-text { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; }
+.sidebar-logo .logo-text span { color:var(--accent); }
+.sidebar-logo .logo-sub { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
+.sidebar-nav { flex:1; padding:16px 0; }
+.nav-section { font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:8px 20px 6px; }
+.nav-item { display:flex; align-items:center; gap:12px; padding:10px 20px; font-size:14px; color:var(--muted); cursor:pointer; transition:all .2s; border-left:2px solid transparent; }
+.nav-item:hover { color:var(--text); background:rgba(255,255,255,0.03); }
+.nav-item.active { color:var(--accent); border-left-color:var(--accent); background:rgba(232,255,60,0.05); }
+.nav-icon { font-size:16px; width:20px; text-align:center; }
+.sidebar-footer { padding:16px 20px; border-top:1px solid var(--border); }
+.user-chip { display:flex; align-items:center; gap:10px; }
+.user-avatar { width:32px; height:32px; background:var(--accent); color:#0a0c10; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.user-name { font-size:13px; font-weight:500; }
+.user-role { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+.btn-logout { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; margin-left:auto; transition:color .2s; }
+.btn-logout:hover { color:var(--danger); }
+
+/* MAIN */
+.main { flex:1; overflow-y:auto; }
+.main-inner { padding:32px; max-width:1200px; }
+
+/* VIEWS */
+.view { display:none; }
+.view.active { display:block; }
+
+/* PAGE HEADER */
+.page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:32px; gap:16px; flex-wrap:wrap; }
+.page-title { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:2px; line-height:1; }
+.page-title span { color:var(--accent); }
+.page-subtitle { font-size:13px; color:var(--muted); margin-top:4px; }
+
+/* BUTTONS */
+.btn { font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; padding:10px 20px; border:none; cursor:pointer; transition:all .2s; letter-spacing:.5px; display:inline-flex; align-items:center; gap:8px; }
+.btn-accent { background:var(--accent); color:#0a0c10; }
+.btn-accent:hover { opacity:.85; }
+.btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+.btn-ghost:hover { color:var(--text); border-color:var(--border2); background:var(--card2); }
+.btn-danger { background:rgba(255,77,77,0.1); color:var(--danger); border:1px solid rgba(255,77,77,0.3); }
+.btn-sm { padding:6px 14px; font-size:12px; }
+
+/* STATS CARDS */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:32px; }
+.stat-card { background:var(--card); border:1px solid var(--border); padding:20px; position:relative; overflow:hidden; }
+.stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.stat-card.s-accent::before { background:var(--accent); }
+.stat-card.s-cyan::before { background:var(--accent2); }
+.stat-card.s-danger::before { background:var(--danger); }
+.stat-card.s-warn::before { background:var(--warning); }
+.stat-label { font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.stat-value { font-family:'Bebas Neue',sans-serif; font-size:44px; letter-spacing:1px; line-height:1; }
+.stat-card.s-accent .stat-value { color:var(--accent); }
+.stat-card.s-cyan .stat-value { color:var(--accent2); }
+.stat-card.s-danger .stat-value { color:var(--danger); }
+.stat-card.s-warn .stat-value { color:var(--warning); }
+.stat-sub { font-size:11px; color:var(--muted); margin-top:6px; }
+
+/* TABLES */
+.table-wrap { background:var(--card); border:1px solid var(--border); overflow:hidden; }
+.table-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); gap:12px; flex-wrap:wrap; }
+.table-title { font-size:14px; font-weight:600; }
+.search-input { background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; padding:8px 14px; outline:none; width:220px; }
+.search-input:focus { border-color:var(--accent); }
+.search-input::placeholder { color:var(--muted); }
+table { width:100%; border-collapse:collapse; }
+th { font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--muted); padding:12px 20px; text-align:left; border-bottom:1px solid var(--border); }
+td { font-size:13px; padding:14px 20px; border-bottom:1px solid var(--border); color:var(--text); vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,0.02); }
+
+/* BADGES */
+.badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:3px 8px; }
+.badge-green { background:rgba(77,255,145,0.1); color:var(--success); }
+.badge-red { background:rgba(255,77,77,0.1); color:var(--danger); }
+.badge-warn { background:rgba(255,170,0,0.1); color:var(--warning); }
+.badge-gray { background:rgba(255,255,255,0.06); color:var(--muted); }
+.badge-accent { background:rgba(232,255,60,0.1); color:var(--accent); }
+.badge-cyan { background:rgba(60,255,232,0.1); color:var(--accent2); }
+
+/* ACTION ROW */
+.action-row { display:flex; gap:8px; }
+
+/* MODAL */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:100; align-items:center; justify-content:center; padding:24px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--card); border:1px solid var(--border2); width:100%; max-width:600px; max-height:90vh; overflow-y:auto; }
+.modal-head { display:flex; align-items:center; justify-content:space-between; padding:20px 24px; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--card); }
+.modal-title { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:1px; }
+.modal-close { background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer; transition:color .2s; line-height:1; }
+.modal-close:hover { color:var(--text); }
+.modal-body { padding:24px; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-group { margin-bottom:16px; }
+.form-select { width:100%; background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; padding:12px 14px; outline:none; appearance:none; cursor:pointer; }
+.form-select:focus { border-color:var(--accent); }
+.form-textarea { width:100%; background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; padding:12px 14px; outline:none; resize:vertical; min-height:80px; }
+.form-textarea:focus { border-color:var(--accent); }
+.section-divider { font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); border-bottom:1px solid rgba(232,255,60,0.2); padding-bottom:8px; margin:20px 0 16px; }
+
+/* PATIENT PROFILE */
+.profile-grid { display:grid; grid-template-columns:280px 1fr; gap:24px; }
+.profile-card { background:var(--card); border:1px solid var(--border); padding:24px; }
+.profile-avatar { width:64px; height:64px; background:var(--accent); color:#0a0c10; font-family:'Bebas Neue',sans-serif; font-size:28px; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+.profile-name { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; line-height:1; margin-bottom:4px; }
+.profile-sport { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:16px; }
+.profile-stat { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
+.profile-stat:last-child { border-bottom:none; }
+.profile-stat-label { color:var(--muted); }
+.profile-stat-val { font-weight:500; }
+.tabs { display:flex; gap:0; border-bottom:1px solid var(--border); margin-bottom:24px; }
+.tab { font-size:13px; font-weight:500; padding:10px 20px; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; }
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+.tab:hover:not(.active) { color:var(--text); }
+
+/* MUSCLE RADAR */
+.muscle-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:20px; }
+.muscle-row { background:var(--surface); border:1px solid var(--border); padding:12px 14px; }
+.muscle-name { font-size:12px; font-weight:500; margin-bottom:6px; }
+.muscle-bar-wrap { background:var(--bg); height:6px; position:relative; }
+.muscle-bar { height:6px; transition:width .4s; }
+.bar-strong { background:var(--success); width:90%; }
+.bar-normal { background:var(--accent2); width:65%; }
+.bar-weak { background:var(--warning); width:35%; }
+.bar-vweak { background:var(--danger); width:15%; }
+.muscle-rating { font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+.rating-strong { color:var(--success); }
+.rating-normal { color:var(--accent2); }
+.rating-weak { color:var(--warning); }
+.rating-vweak { color:var(--danger); }
+
+/* INJURY LOG */
+.injury-item { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--danger); padding:16px; margin-bottom:10px; }
+.injury-item.recovered { border-left-color:var(--success); }
+.injury-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:8px; }
+.injury-name { font-size:14px; font-weight:600; }
+.injury-meta { font-size:12px; color:var(--muted); margin-top:4px; }
+
+/* SESSION CARDS */
+.sessions-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+.session-card { background:var(--card); border:1px solid var(--border); border-top:2px solid var(--accent2); padding:20px; cursor:pointer; transition:all .2s; }
+.session-card:hover { border-color:var(--accent2); background:var(--card2); transform:translateY(-2px); }
+.session-type-badge { font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent2); margin-bottom:10px; }
+.session-title { font-size:15px; font-weight:600; margin-bottom:6px; }
+.session-meta { font-size:12px; color:var(--muted); }
+.session-exercises { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+.exercise-item { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.exercise-item:last-child { border-bottom:none; }
+.exercise-name { color:var(--text); }
+.exercise-spec { color:var(--muted); }
+
+/* PROGRESS CHARTS */
+.chart-wrap { background:var(--card); border:1px solid var(--border); padding:20px; margin-bottom:16px; }
+.chart-title { font-size:13px; font-weight:600; margin-bottom:16px; }
+.mini-chart { display:flex; align-items:flex-end; gap:6px; height:60px; }
+.chart-bar { flex:1; background:var(--accent); opacity:.7; border-radius:2px 2px 0 0; transition:opacity .2s; min-width:8px; }
+.chart-bar:hover { opacity:1; }
+.chart-labels { display:flex; gap:6px; margin-top:6px; }
+.chart-label { flex:1; font-size:9px; color:var(--muted); text-align:center; min-width:8px; }
+
+/* PATIENT VIEW */
+.patient-dashboard { max-width:700px; margin:0 auto; }
+.today-session { background:var(--card); border:1px solid var(--border); border-top:3px solid var(--accent); padding:24px; margin-bottom:24px; }
+.today-label { font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
+.today-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; margin-bottom:4px; }
+.today-desc { font-size:13px; color:var(--muted); margin-bottom:20px; }
+.exercise-list { display:flex; flex-direction:column; gap:8px; }
+.ex-row { display:flex; justify-content:space-between; align-items:center; background:var(--surface); padding:12px 16px; border:1px solid var(--border); }
+.ex-info { font-size:13px; font-weight:500; }
+.ex-detail { font-size:12px; color:var(--muted); margin-top:2px; }
+.ex-spec { font-size:12px; color:var(--accent2); font-weight:600; white-space:nowrap; }
+
+/* TOAST */
+.toast { position:fixed; bottom:24px; right:24px; background:var(--card); border:1px solid var(--border2); border-left:3px solid var(--success); padding:14px 20px; font-size:13px; z-index:200; transform:translateX(200%); transition:transform .3s; max-width:320px; }
+.toast.show { transform:translateX(0); }
+.toast.error { border-left-color:var(--danger); }
+
+/* RESPONSIVE */
+@media (max-width:768px) {
+  .sidebar { display:none; }
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .profile-grid { grid-template-columns:1fr; }
+  .form-row { grid-template-columns:1fr; }
+  .main-inner { padding:16px; }
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.view.active { animation:fadeIn .25s ease; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== LOGIN ===== -->
+<div class="page active" id="page-login">
+  <div class="login-box">
+    <div class="login-logo">ATHLETIX <span>RECOVERY</span> LAB</div>
+    <div class="login-sub">Sports Readaptation Platform</div>
+    <div class="login-card">
+      <div class="login-title">Iniciar sesión</div>
+      <div class="role-tabs">
+        <button class="role-tab active" onclick="setRole('admin',this)">👨‍⚕️ Profesional</button>
+        <button class="role-tab" onclick="setRole('patient',this)">🏃 Paciente</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" type="email" id="login-email" placeholder="tu@email.com" value="admin@athletix.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" type="password" id="login-pass" placeholder="••••••••" value="123456">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">ENTRAR</button>
+      <div class="demo-hint">
+        Demo profesional: <strong>admin@athletix.com</strong> / <strong>123456</strong><br>
+        Demo paciente: <strong>paciente@athletix.com</strong> / <strong>123456</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="page" id="page-app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-text">ATHLETIX <span>RL</span></div>
+      <div class="logo-sub">Recovery Lab</div>
+    </div>
+    <nav class="sidebar-nav" id="admin-nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" onclick="showView('dashboard',this)"><span class="nav-icon">⬛</span> Dashboard</div>
+      <div class="nav-item" onclick="showView('patients',this)"><span class="nav-icon">👥</span> Pacientes</div>
+      <div class="nav-item" onclick="showView('sessions',this)"><span class="nav-icon">📋</span> Sesiones</div>
+      <div class="nav-section">Análisis</div>
+      <div class="nav-item" onclick="showView('progress',this)"><span class="nav-icon">📈</span> Progreso</div>
+    </nav>
+    <nav class="sidebar-nav" id="patient-nav" style="display:none">
+      <div class="nav-section">Mi espacio</div>
+      <div class="nav-item active" onclick="showView('patient-home',this)"><span class="nav-icon">🏠</span> Inicio</div>
+      <div class="nav-item" onclick="showView('patient-sessions',this)"><span class="nav-icon">📋</span> Mis sesiones</div>
+      <div class="nav-item" onclick="showView('patient-progress',this)"><span class="nav-icon">📈</span> Mi progreso</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-chip">
+        <div class="user-avatar" id="user-avatar">J</div>
+        <div>
+          <div class="user-name" id="user-name">Jesús B.</div>
+          <div class="user-role" id="user-role">Profesional</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()" title="Cerrar sesión">⏏</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="page-header">
+          <div>
+            <div class="page-title">DASH<span>BOARD</span></div>
+            <div class="page-subtitle">Resumen general de tus pacientes y sesiones</div>
+          </div>
+          <button class="btn btn-accent" onclick="openModal('modal-patient')">+ Nuevo paciente</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card s-accent">
+            <div class="stat-label">Pacientes activos</div>
+            <div class="stat-value">6</div>
+            <div class="stat-sub">↑ 2 este mes</div>
+          </div>
+          <div class="stat-card s-cyan">
+            <div class="stat-label">Sesiones esta semana</div>
+            <div class="stat-value">14</div>
+            <div class="stat-sub">3 completadas hoy</div>
+          </div>
+          <div class="stat-card s-danger">
+            <div class="stat-label">Lesiones activas</div>
+            <div class="stat-value">3</div>
+            <div class="stat-sub">2 en fase subaguda</div>
+          </div>
+          <div class="stat-card s-warn">
+            <div class="stat-label">Sesiones plantilla</div>
+            <div class="stat-value">8</div>
+            <div class="stat-sub">Listas para asignar</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Pacientes recientes</div>
+            <button class="btn btn-ghost btn-sm" onclick="showView('patients', document.querySelector('[onclick*=patients]'))">Ver todos →</button>
+          </div>
+          <table>
+            <thead><tr>
+              <th>Paciente</th><th>Deporte</th><th>Lesión activa</th><th>Fase</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="dashboard-patients"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PACIENTES -->
+      <div class="view" id="view-patients">
+        <div class="page-header">
+          <div>
+            <div class="page-title">PACI<span>ENTES</span></div>
+            <div class="page-subtitle">Gestión completa de fichas y seguimiento</div>
+          </div>
+          <button class="btn btn-accent" onclick="openModal('modal-patient')">+ Nuevo paciente</button>
+        </div>
+        <div class="table-wrap">
+          <div class="table-header">
+            <div class="table-title">Todos los pacientes</div>
+            <input class="search-input" placeholder="🔍  Buscar paciente..." oninput="filterPatients(this.value)">
+          </div>
+          <table>
+            <thead><tr>
+              <th>Nombre</th><th>Edad</th><th>Deporte / Club</th><th>Estado</th><th>Última sesión</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="patients-table"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PERFIL PACIENTE -->
+      <div class="view" id="view-patient-profile">
+        <div class="page-header">
+          <div>
+            <button class="btn btn-ghost btn-sm" onclick="showView('patients', document.querySelector('[onclick*=patients]'))" style="margin-bottom:8px">← Volver</button>
+            <div class="page-title" id="profile-title">PERFIL</div>
+          </div>
+          <button class="btn btn-accent" onclick="openModal('modal-session')">+ Asignar sesión</button>
+        </div>
+        <div class="profile-grid">
+          <div>
+            <div class="profile-card" style="margin-bottom:16px">
+              <div class="profile-avatar" id="profile-avatar">JB</div>
+              <div class="profile-name" id="profile-name">Nombre</div>
+              <div class="profile-sport" id="profile-sport">Deporte</div>
+              <div class="profile-stat"><span class="profile-stat-label">Edad</span><span class="profile-stat-val" id="profile-age">—</span></div>
+              <div class="profile-stat"><span class="profile-stat-label">Peso</span><span class="profile-stat-val" id="profile-weight">—</span></div>
+              <div class="profile-stat"><span class="profile-stat-label">Talla</span><span class="profile-stat-val" id="profile-height">—</span></div>
+              <div class="profile-stat"><span class="profile-stat-label">Pierna dom.</span><span class="profile-stat-val" id="profile-leg">—</span></div>
+              <div class="profile-stat"><span class="profile-stat-label">Club</span><span class="profile-stat-val" id="profile-club">—</span></div>
+            </div>
+            <div class="profile-card">
+              <div class="section-divider">Notas posturales</div>
+              <div id="profile-postural" style="font-size:13px;color:var(--muted);line-height:1.7">—</div>
+            </div>
+          </div>
+          <div>
+            <div class="tabs">
+              <div class="tab active" onclick="showTab('tab-muscle',this)">Valoración muscular</div>
+              <div class="tab" onclick="showTab('tab-injuries',this)">Historial lesiones</div>
+              <div class="tab" onclick="showTab('tab-sessions',this)">Sesiones</div>
+            </div>
+            <div id="tab-muscle">
+              <div class="section-divider">Balance muscular</div>
+              <div class="muscle-grid" id="muscle-grid"></div>
+            </div>
+            <div id="tab-injuries" style="display:none">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+                <div class="section-divider" style="margin:0;flex:1">Historial de lesiones</div>
+                <button class="btn btn-ghost btn-sm" style="margin-left:12px" onclick="openModal('modal-injury')">+ Añadir</button>
+              </div>
+              <div id="injury-list"></div>
+            </div>
+            <div id="tab-sessions" style="display:none">
+              <div class="section-divider">Sesiones asignadas</div>
+              <div id="profile-sessions-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SESIONES -->
+      <div class="view" id="view-sessions">
+        <div class="page-header">
+          <div>
+            <div class="page-title">SESI<span>ONES</span></div>
+            <div class="page-subtitle">Plantillas y sesiones asignadas</div>
+          </div>
+          <button class="btn btn-accent" onclick="openModal('modal-new-session')">+ Nueva sesión</button>
+        </div>
+        <div class="sessions-grid" id="sessions-grid"></div>
+      </div>
+
+      <!-- PROGRESO -->
+      <div class="view" id="view-progress">
+        <div class="page-header">
+          <div>
+            <div class="page-title">PROG<span>RESO</span></div>
+            <div class="page-subtitle">Evolución y métricas de tus pacientes</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px" id="progress-cards"></div>
+      </div>
+
+      <!-- PATIENT HOME -->
+      <div class="view" id="view-patient-home">
+        <div class="patient-dashboard">
+          <div class="page-header">
+            <div>
+              <div class="page-title">HOLA, <span id="patient-greeting">ATLETA</span></div>
+              <div class="page-subtitle" id="patient-date"></div>
+            </div>
+          </div>
+          <div class="today-session">
+            <div class="today-label">📅 Sesión de hoy</div>
+            <div class="today-title">PreSeason Óptima — Día 1</div>
+            <div class="today-desc">Sesión de activación, compensatorio y tren inferior. Sin material externo necesario.</div>
+            <div class="exercise-list">
+              <div class="ex-row"><div><div class="ex-info">Movilidad tronco en caballero</div><div class="ex-detail">Activación</div></div><div class="ex-spec">1×6 lado</div></div>
+              <div class="ex-row"><div><div class="ex-info">Rotación interna/externa cadera</div><div class="ex-detail">Activación</div></div><div class="ex-spec">1×10 lado</div></div>
+              <div class="ex-row"><div><div class="ex-info">Clamshell isotónico con goma</div><div class="ex-detail">Compensatorio</div></div><div class="ex-spec">2×15 lado</div></div>
+              <div class="ex-row"><div><div class="ex-info">Puente de glúteo con miniband</div><div class="ex-detail">Compensatorio</div></div><div class="ex-spec">2×15</div></div>
+              <div class="ex-row"><div><div class="ex-info">Abducción cadera con goma</div><div class="ex-detail">Compensatorio</div></div><div class="ex-spec">1×10 lado</div></div>
+              <div class="ex-row"><div><div class="ex-info">Plancha abdominal isométrica</div><div class="ex-detail">Core</div></div><div class="ex-spec">30 seg</div></div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-header"><div class="table-title">Mi estado actual</div></div>
+            <table>
+              <tbody>
+                <tr><td style="color:var(--muted)">Lesión activa</td><td><span class="badge badge-red">Rotura Isquiotibial G2</span></td></tr>
+                <tr><td style="color:var(--muted)">Fase recuperación</td><td><span class="badge badge-warn">Subaguda — Semana 1</span></td></tr>
+                <tr><td style="color:var(--muted)">Vuelta al deporte</td><td><span class="badge badge-gray">Pendiente evaluación</span></td></tr>
+                <tr><td style="color:var(--muted)">Próxima revisión</td><td><span class="badge badge-accent">Por determinar</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PATIENT SESSIONS -->
+      <div class="view" id="view-patient-sessions">
+        <div class="patient-dashboard">
+          <div class="page-header"><div><div class="page-title">MIS <span>SESIONES</span></div></div></div>
+          <div class="sessions-grid" id="patient-sessions-grid"></div>
+        </div>
+      </div>
+
+      <!-- PATIENT PROGRESS -->
+      <div class="view" id="view-patient-progress">
+        <div class="patient-dashboard">
+          <div class="page-header"><div><div class="page-title">MI <span>PROGRESO</span></div></div></div>
+          <div class="chart-wrap">
+            <div class="chart-title">Nivel de dolor por sesión (0–10)</div>
+            <div class="mini-chart" id="pain-chart"></div>
+            <div class="chart-labels" id="pain-labels"></div>
+          </div>
+          <div class="section-divider">Balance muscular actual</div>
+          <div class="muscle-grid" id="patient-muscle-grid"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: NUEVO PACIENTE -->
+<div class="modal-overlay" id="modal-patient">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">NUEVO PACIENTE</div>
+      <button class="modal-close" onclick="closeModal('modal-patient')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="section-divider">Datos personales</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nombre completo</label><input class="form-input" id="p-name" placeholder="Nombre Apellido"></div>
+        <div class="form-group"><label class="form-label">Fecha de nacimiento</label><input class="form-input" id="p-dob" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Deporte</label><input class="form-input" id="p-sport" placeholder="Fútbol Sala"></div>
+        <div class="form-group"><label class="form-label">Club / Equipo</label><input class="form-input" id="p-club" placeholder="Club Atlético"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Peso (kg)</label><input class="form-input" id="p-weight" type="number" placeholder="70"></div>
+        <div class="form-group"><label class="form-label">Talla (cm)</label><input class="form-input" id="p-height" type="number" placeholder="175"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Pierna dominante</label>
+          <select class="form-select" id="p-leg"><option>Derecha</option><option>Izquierda</option><option>Ambidiestro</option></select>
+        </div>
+      </div>
+      <div class="section-divider">Valoración muscular inicial</div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Cuádriceps</label><select class="form-select" id="m-quad"><option>Fuerte</option><option>Normal</option><option>Débil</option><option>Muy débil</option></select></div>
+        <div class="form-group"><label class="form-label">Isquiotibiales</label><select class="form-select" id="m-ham"><option>Fuerte</option><option>Normal</option><option>Débil</option><option selected>Muy débil</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Psoas</label><select class="form-select" id="m-psoas"><option>Fuerte</option><option>Normal</option><option>Débil</option><option>Muy débil</option></select></div>
+        <div class="form-group"><label class="form-label">Aductor</label><select class="form-select" id="m-add"><option>Fuerte</option><option>Normal</option><option selected>Débil</option><option>Muy débil</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Abductor</label><select class="form-select" id="m-abd"><option>Fuerte</option><option selected>Normal</option><option>Débil</option><option>Muy débil</option></select></div>
+        <div class="form-group"><label class="form-label">Glúteo</label><select class="form-select" id="m-glute"><option>Fuerte</option><option selected>Normal</option><option>Débil</option><option>Muy débil</option></select></div>
+      </div>
+      <div class="section-divider">Notas posturales</div>
+      <div class="form-group"><textarea class="form-textarea" id="p-postural" placeholder="Valgo de talón, asimetría de piernas, recomendaciones podología..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-patient')">Cancelar</button>
+      <button class="btn btn-accent" onclick="addPatient()">Guardar paciente</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: AÑADIR LESIÓN -->
+<div class="modal-overlay" id="modal-injury">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">NUEVA LESIÓN</div>
+      <button class="modal-close" onclick="closeModal('modal-injury')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Músculo / Articulación</label><input class="form-input" id="i-muscle" placeholder="Isquiotibial derecho"></div>
+        <div class="form-group"><label class="form-label">Tipo de lesión</label><input class="form-input" id="i-type" placeholder="Rotura muscular"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Grado</label><select class="form-select" id="i-grade"><option>Grado 1</option><option selected>Grado 2</option><option>Grado 3</option></select></div>
+        <div class="form-group"><label class="form-label">Fecha</label><input class="form-input" id="i-date" type="date"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Mecanismo</label><select class="form-select" id="i-mech"><option>Contacto directo</option><option>Sobrecarga</option><option selected>Fatiga</option><option>Otro</option></select></div>
+        <div class="form-group"><label class="form-label">Fase actual</label><select class="form-select" id="i-phase"><option>Aguda</option><option selected>Subaguda</option><option>Remodelación</option><option>Vuelta al deporte</option></select></div>
+      </div>
+      <div class="form-group"><label class="form-label">Notas</label><textarea class="form-textarea" id="i-notes" placeholder="Observaciones adicionales..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-injury')">Cancelar</button>
+      <button class="btn btn-accent" onclick="addInjury()">Guardar lesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NUEVA SESIÓN PLANTILLA -->
+<div class="modal-overlay" id="modal-new-session">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">NUEVA SESIÓN</div>
+      <button class="modal-close" onclick="closeModal('modal-new-session')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Título de la sesión</label><input class="form-input" id="s-title" placeholder="PreSeason Fuerza Día 2"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Tipo</label>
+          <select class="form-select" id="s-type">
+            <option>Activación</option><option>Compensatorio</option><option>Fuerza</option><option>Movilidad</option><option>Cardio</option><option>Recuperación</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Descripción</label><textarea class="form-textarea" id="s-desc" placeholder="Describe el objetivo de la sesión..."></textarea></div>
+      <div class="section-divider">Ejercicios</div>
+      <div id="exercises-list"></div>
+      <button class="btn btn-ghost btn-sm" onclick="addExerciseField()" style="margin-top:8px">+ Añadir ejercicio</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-new-session')">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveSession()">Guardar sesión</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+let currentRole = 'admin';
+let currentPatient = null;
+
+const patients = [
+  { id:1, name:'Jesús Borreguero', dob:'2006-01-02', sport:'Fútbol Sala', club:'Desguace Paris La Algaida FS', weight:'72', height:'178', leg:'Derecha',
+    postural:'Ligero valgo de talón bilateral. Ligera asimetría en longitud de piernas (no preocupante). Recomendado estudio podológico para plantillas antes de la próxima temporada.',
+    muscles:{ quad:'Fuerte', ham:'Muy débil', psoas:'Fuerte', add:'Débil', abd:'Normal', glute:'Normal' },
+    injuries:[{ muscle:'Isquiotibial derecho', type:'Rotura muscular', grade:'Grado 2', date:'2026-03-18', mech:'Fatiga', phase:'Subaguda', status:'activa', notes:'Lesión recurrente. Nunca ha recuperado bien la fuerza en episodios anteriores.' }],
+    sessions:['PreSeason Óptima Básica — Día 1'], lastSession:'Hoy', status:'lesionado' },
+  { id:2, name:'Carlos Martínez', dob:'2000-05-14', sport:'Fútbol', club:'CF Archena', weight:'75', height:'180', leg:'Derecha',
+    postural:'Sin alteraciones posturales relevantes.',
+    muscles:{ quad:'Fuerte', ham:'Normal', psoas:'Normal', add:'Normal', abd:'Fuerte', glute:'Fuerte' },
+    injuries:[], sessions:['Fuerza Base Día 1','Fuerza Base Día 2'], lastSession:'Ayer', status:'activo' },
+  { id:3, name:'Laura Sánchez', dob:'1998-11-30', sport:'Atletismo', club:'Club Atletismo Murcia', weight:'58', height:'165', leg:'Derecha',
+    postural:'Hiperpronación pie izquierdo. Pendiente revisión fisio.',
+    muscles:{ quad:'Normal', ham:'Débil', psoas:'Normal', add:'Débil', abd:'Normal', glute:'Débil' },
+    injuries:[{ muscle:'Rodilla izquierda', type:'Tendinopatía rotuliana', grade:'Grado 1', date:'2026-02-10', mech:'Sobrecarga', phase:'Remodelación', status:'activa', notes:'Mejorando progresivamente.' }],
+    sessions:['Readaptación Rodilla Fase 1'], lastSession:'Hace 2 días', status:'lesionado' },
+];
+
+const sessionTemplates = [
+  { id:1, title:'PreSeason Óptima Básica — Día 1', type:'Compensatorio', desc:'Sesión de activación, compensatorio y tren inferior. Sin material.',
+    exercises:[
+      { name:'Movilidad tronco en caballero', sets:1, reps:'6 lado', rest:'30"', cat:'Activación' },
+      { name:'Rotación interna/externa cadera', sets:1, reps:'10 lado', rest:'30"', cat:'Activación' },
+      { name:'Clamshell isotónico con goma', sets:2, reps:'15 lado', rest:'30"', cat:'Compensatorio' },
+      { name:'Puente de glúteo con miniband', sets:2, reps:'15', rest:'30"', cat:'Compensatorio' },
+      { name:'Abducción cadera con goma', sets:1, reps:'10 lado', rest:'30"', cat:'Compensatorio' },
+      { name:'Plancha abdominal isométrica', sets:1, reps:'30 seg', rest:'30"', cat:'Core' },
+    ]},
+  { id:2, title:'Movilidad Adaptada — Isquiotibial', type:'Movilidad', desc:'Programa de movilidad seguro durante fase aguda de rotura isquiotibial G2.',
+    exercises:[
+      { name:'Dorsiflexión Knee-to-Wall', sets:3, reps:'10 cada lado', rest:'45"', cat:'Tobillo' },
+      { name:'Círculos tobillo en sedestación', sets:2, reps:'10 c/sentido', rest:'30"', cat:'Tobillo' },
+      { name:'Hip 90/90', sets:3, reps:'60 seg/posición', rest:'30"', cat:'Cadera' },
+      { name:'Fire Hydrant', sets:3, reps:'12 lado', rest:'45"', cat:'Cadera' },
+      { name:'Cat-Cow', sets:2, reps:'10 lentas', rest:'30"', cat:'Tronco' },
+      { name:'Rotación torácica cuadrupedia', sets:3, reps:'10 lado', rest:'45"', cat:'Tronco' },
+    ]},
+  { id:3, title:'Fuerza Base Día 1', type:'Fuerza', desc:'Introducción al trabajo de fuerza con peso corporal y gomas.',
+    exercises:[
+      { name:'Sentadilla overhead con goma', sets:3, reps:'10', rest:'30"', cat:'Principal' },
+      { name:'Sentadilla peso corporal', sets:3, reps:'10', rest:'30"', cat:'Principal' },
+      { name:'Zancada hacia delante', sets:3, reps:'10', rest:'30"', cat:'Principal' },
+      { name:'Puente de hombros', sets:3, reps:'10', rest:'30"', cat:'Principal' },
+    ]},
+];
+
+const painData = [3,4,3,2,3,2,1,2];
+const painWeeks = ['S1','S2','S3','S4','S5','S6','S7','S8'];
+
+// ===== LOGIN =====
+function setRole(role, btn) {
+  currentRole = role;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if(role === 'admin') {
+    document.getElementById('login-email').value = 'admin@athletix.com';
+  } else {
+    document.getElementById('login-email').value = 'paciente@athletix.com';
+  }
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-pass').value;
+  if(!email || !pass) { showToast('Completa todos los campos', true); return; }
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('page-app').classList.add('active');
+  if(currentRole === 'admin') {
+    document.getElementById('admin-nav').style.display = '';
+    document.getElementById('patient-nav').style.display = 'none';
+    document.getElementById('user-avatar').textContent = 'J';
+    document.getElementById('user-name').textContent = 'Jesús B.';
+    document.getElementById('user-role').textContent = 'Profesional';
+    showView('dashboard', document.querySelector('#admin-nav .nav-item'));
+    renderDashboard();
+    renderPatientsTable();
+    renderSessions();
+    renderProgress();
+  } else {
+    document.getElementById('admin-nav').style.display = 'none';
+    document.getElementById('patient-nav').style.display = '';
+    document.getElementById('user-avatar').textContent = 'JB';
+    document.getElementById('user-name').textContent = 'Jesús B.';
+    document.getElementById('user-role').textContent = 'Paciente';
+    const now = new Date();
+    document.getElementById('patient-greeting').textContent = 'JESÚS';
+    document.getElementById('patient-date').textContent = now.toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    showView('patient-home', document.querySelector('#patient-nav .nav-item'));
+    renderPatientSessions();
+    renderPatientProgress();
+  }
+}
+
+function doLogout() {
+  document.getElementById('page-app').classList.remove('active');
+  document.getElementById('page-login').classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-dashboard').classList.add('active');
+}
+
+// ===== NAVIGATION =====
+function showView(viewId, navEl) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+viewId).classList.add('active');
+  if(navEl) {
+    const navParent = navEl.closest('nav');
+    if(navParent) navParent.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    navEl.classList.add('active');
+  }
+}
+
+function showTab(tabId, el) {
+  document.querySelectorAll('#view-patient-profile .tabs .tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['tab-muscle','tab-injuries','tab-sessions'].forEach(id => {
+    document.getElementById(id).style.display = id === tabId ? '' : 'none';
+  });
+}
+
+// ===== RENDER =====
+function ratingClass(r) {
+  const map = {'Fuerte':'strong','Normal':'normal','Débil':'weak','Muy débil':'vweak'};
+  return map[r] || 'normal';
+}
+function ratingBar(r) {
+  const map = {'Fuerte':'bar-strong','Normal':'bar-normal','Débil':'bar-weak','Muy débil':'bar-vweak'};
+  return map[r] || 'bar-normal';
+}
+function statusBadge(s) {
+  if(s==='activo') return '<span class="badge badge-green">Activo</span>';
+  if(s==='lesionado') return '<span class="badge badge-red">Lesionado</span>';
+  return '<span class="badge badge-gray">'+s+'</span>';
+}
+function phaseBadge(p) {
+  const map = {'Aguda':'badge-red','Subaguda':'badge-warn','Remodelación':'badge-cyan','Vuelta al deporte':'badge-green'};
+  return '<span class="badge '+(map[p]||'badge-gray')+'">'+p+'</span>';
+}
+
+function renderDashboard() {
+  const tbody = document.getElementById('dashboard-patients');
+  tbody.innerHTML = patients.slice(0,3).map(p => {
+    const inj = p.injuries.find(i=>i.status==='activa');
+    return `<tr>
+      <td><strong>${p.name}</strong></td>
+      <td>${p.sport}</td>
+      <td>${inj ? '<span class="badge badge-red">'+inj.muscle+'</span>' : '<span class="badge badge-green">Sin lesión</span>'}</td>
+      <td>${inj ? phaseBadge(inj.phase) : '—'}</td>
+      <td><div class="action-row"><button class="btn btn-ghost btn-sm" onclick="openProfile(${p.id})">Ver perfil</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPatientsTable(filter='') {
+  const tbody = document.getElementById('patients-table');
+  const list = filter ? patients.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())) : patients;
+  tbody.innerHTML = list.map(p => `<tr>
+    <td><strong>${p.name}</strong></td>
+    <td>${calcAge(p.dob)}</td>
+    <td>${p.sport}<br><span style="font-size:11px;color:var(--muted)">${p.club}</span></td>
+    <td>${statusBadge(p.status)}</td>
+    <td style="color:var(--muted);font-size:12px">${p.lastSession}</td>
+    <td><div class="action-row">
+      <button class="btn btn-ghost btn-sm" onclick="openProfile(${p.id})">Ver perfil</button>
+    </div></td>
+  </tr>`).join('');
+}
+
+function filterPatients(val) { renderPatientsTable(val); }
+
+function calcAge(dob) {
+  const d = new Date(dob), now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  if(now < new Date(now.getFullYear(), d.getMonth(), d.getDate())) age--;
+  return age + ' años';
+}
+
+function openProfile(id) {
+  currentPatient = patients.find(p=>p.id===id);
+  if(!currentPatient) return;
+  const p = currentPatient;
+  document.getElementById('profile-title').innerHTML = p.name.split(' ')[0].toUpperCase()+' <span>'+p.name.split(' ').slice(1).join(' ').toUpperCase()+'</span>';
+  document.getElementById('profile-avatar').textContent = p.name.split(' ').map(n=>n[0]).slice(0,2).join('');
+  document.getElementById('profile-name').textContent = p.name;
+  document.getElementById('profile-sport').textContent = p.sport + ' · ' + p.club;
+  document.getElementById('profile-age').textContent = calcAge(p.dob);
+  document.getElementById('profile-weight').textContent = p.weight + ' kg';
+  document.getElementById('profile-height').textContent = p.height + ' cm';
+  document.getElementById('profile-leg').textContent = p.leg;
+  document.getElementById('profile-club').textContent = p.club;
+  document.getElementById('profile-postural').textContent = p.postural || 'Sin notas posturales.';
+  renderMuscleGrid(p.muscles, 'muscle-grid');
+  renderInjuries(p.injuries);
+  renderProfileSessions(p.sessions);
+  showView('patient-profile', null);
+  document.querySelectorAll('#admin-nav .nav-item').forEach(n=>n.classList.remove('active'));
+}
+
+function renderMuscleGrid(muscles, containerId) {
+  const labels = { quad:'Cuádriceps', ham:'Isquiotibiales', psoas:'Psoas', add:'Aductor', abd:'Abductor', glute:'Glúteo' };
+  document.getElementById(containerId).innerHTML = Object.entries(muscles).map(([k,v]) =>
+    `<div class="muscle-row">
+      <div class="muscle-name">${labels[k]||k}</div>
+      <div class="muscle-bar-wrap"><div class="muscle-bar ${ratingBar(v)}"></div></div>
+      <div class="muscle-rating rating-${ratingClass(v)}">${v}</div>
+    </div>`
+  ).join('');
+}
+
+function renderInjuries(injuries) {
+  document.getElementById('injury-list').innerHTML = injuries.length ? injuries.map(i =>
+    `<div class="injury-item ${i.status==='recuperada'?'recovered':''}">
+      <div class="injury-top">
+        <div>
+          <div class="injury-name">${i.muscle} — ${i.type}</div>
+          <div class="injury-meta">${i.date} · ${i.mech} · ${i.grade}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">${phaseBadge(i.phase)} ${i.status==='activa'?'<span class="badge badge-red">Activa</span>':'<span class="badge badge-green">Recuperada</span>'}</div>
+      </div>
+      ${i.notes?'<div style="font-size:12px;color:var(--muted);margin-top:4px">'+i.notes+'</div>':''}
+    </div>`
+  ).join('') : '<div style="color:var(--muted);font-size:13px;padding:16px 0">Sin lesiones registradas.</div>';
+}
+
+function renderProfileSessions(sessions) {
+  document.getElementById('profile-sessions-list').innerHTML = sessions.map(s =>
+    `<div style="background:var(--surface);border:1px solid var(--border);padding:12px 16px;margin-bottom:8px;font-size:13px;font-weight:500">${s}</div>`
+  ).join('');
+}
+
+function renderSessions() {
+  document.getElementById('sessions-grid').innerHTML = sessionTemplates.map(s =>
+    `<div class="session-card">
+      <div class="session-type-badge">${s.type}</div>
+      <div class="session-title">${s.title}</div>
+      <div class="session-meta">${s.exercises.length} ejercicios</div>
+      <div class="session-exercises">
+        ${s.exercises.slice(0,4).map(e =>
+          `<div class="exercise-item"><span class="exercise-name">${e.name}</span><span class="exercise-spec">${e.sets}×${e.reps}</span></div>`
+        ).join('')}
+        ${s.exercises.length>4?'<div style="font-size:11px;color:var(--muted);padding-top:6px">+'+( s.exercises.length-4)+' más</div>':''}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function renderProgress() {
+  document.getElementById('progress-cards').innerHTML = patients.map(p => {
+    const inj = p.injuries.find(i=>i.status==='activa');
+    return `<div class="chart-wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div class="chart-title">${p.name}</div>
+        ${inj?'<span class="badge badge-red">'+inj.muscle+'</span>':'<span class="badge badge-green">Sin lesión</span>'}
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">${p.sport} · ${p.club}</div>
+      <div class="muscle-grid" style="margin-bottom:0">
+        ${Object.entries(p.muscles).slice(0,4).map(([k,v])=>{
+          const labels={quad:'Cuád.',ham:'Isquios',psoas:'Psoas',add:'Aductor',abd:'Abductor',glute:'Glúteo'};
+          return `<div class="muscle-row"><div class="muscle-name">${labels[k]||k}</div><div class="muscle-bar-wrap"><div class="muscle-bar ${ratingBar(v)}"></div></div><div class="muscle-rating rating-${ratingClass(v)}">${v}</div></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPatientSessions() {
+  document.getElementById('patient-sessions-grid').innerHTML = sessionTemplates.slice(0,2).map(s =>
+    `<div class="session-card">
+      <div class="session-type-badge">${s.type}</div>
+      <div class="session-title">${s.title}</div>
+      <div class="session-meta">${s.exercises.length} ejercicios · Asignada por tu profesional</div>
+      <div class="session-exercises">
+        ${s.exercises.map(e =>
+          `<div class="exercise-item"><span class="exercise-name">${e.name}</span><span class="exercise-spec">${e.sets}×${e.reps}</span></div>`
+        ).join('')}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function renderPatientProgress() {
+  const chart = document.getElementById('pain-chart');
+  const labels = document.getElementById('pain-labels');
+  const max = Math.max(...painData);
+  chart.innerHTML = painData.map((v,i) =>
+    `<div class="chart-bar" style="height:${(v/max)*100}%;background:${v>5?'var(--danger)':v>3?'var(--warning)':'var(--success)'}" title="Dolor: ${v}/10"></div>`
+  ).join('');
+  labels.innerHTML = painWeeks.map(w => `<div class="chart-label">${w}</div>`).join('');
+  renderMuscleGrid(patients[0].muscles, 'patient-muscle-grid');
+}
+
+// ===== MODALS =====
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+});
+
+function addPatient() {
+  const name = document.getElementById('p-name').value.trim();
+  if(!name) { showToast('El nombre es obligatorio', true); return; }
+  patients.push({
+    id: Date.now(), name, dob: document.getElementById('p-dob').value,
+    sport: document.getElementById('p-sport').value, club: document.getElementById('p-club').value,
+    weight: document.getElementById('p-weight').value, height: document.getElementById('p-height').value,
+    leg: document.getElementById('p-leg').value, postural: document.getElementById('p-postural').value,
+    muscles: { quad: document.getElementById('m-quad').value, ham: document.getElementById('m-ham').value,
+      psoas: document.getElementById('m-psoas').value, add: document.getElementById('m-add').value,
+      abd: document.getElementById('m-abd').value, glute: document.getElementById('m-glute').value },
+    injuries: [], sessions: [], lastSession: 'Nunca', status: 'activo'
+  });
+  closeModal('modal-patient');
+  renderDashboard(); renderPatientsTable(); renderProgress();
+  showToast('Paciente guardado correctamente ✓');
+}
+
+function addInjury() {
+  if(!currentPatient) return;
+  const muscle = document.getElementById('i-muscle').value.trim();
+  if(!muscle) { showToast('Completa el músculo/articulación', true); return; }
+  currentPatient.injuries.push({
+    muscle, type: document.getElementById('i-type').value,
+    grade: document.getElementById('i-grade').value, date: document.getElementById('i-date').value,
+    mech: document.getElementById('i-mech').value, phase: document.getElementById('i-phase').value,
+    status: 'activa', notes: document.getElementById('i-notes').value
+  });
+  currentPatient.status = 'lesionado';
+  closeModal('modal-injury');
+  renderInjuries(currentPatient.injuries);
+  renderDashboard(); renderPatientsTable();
+  showToast('Lesión registrada correctamente ✓');
+}
+
+let exerciseCount = 0;
+function addExerciseField() {
+  exerciseCount++;
+  const div = document.createElement('div');
+  div.style.cssText = 'background:var(--surface);border:1px solid var(--border);padding:12px;margin-bottom:8px;';
+  div.innerHTML = `<div class="form-row" style="margin-bottom:8px">
+    <input class="form-input" placeholder="Nombre del ejercicio" style="grid-column:span 2">
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+    <input class="form-input" placeholder="Series" type="number" value="3">
+    <input class="form-input" placeholder="Reps">
+    <input class="form-input" placeholder="Descanso">
+    <select class="form-select"><option>Activación</option><option>Compensatorio</option><option>Principal</option><option>Core</option><option>Vuelta calma</option></select>
+  </div>`;
+  document.getElementById('exercises-list').appendChild(div);
+}
+
+function saveSession() {
+  const title = document.getElementById('s-title').value.trim();
+  if(!title) { showToast('El título es obligatorio', true); return; }
+  sessionTemplates.push({
+    id: Date.now(), title, type: document.getElementById('s-type').value,
+    desc: document.getElementById('s-desc').value, exercises: []
+  });
+  closeModal('modal-new-session');
+  renderSessions();
+  showToast('Sesión guardada correctamente ✓');
+  document.getElementById('exercises-list').innerHTML = '';
+  document.getElementById('s-title').value = '';
+  document.getElementById('s-desc').value = '';
+}
+
+// ===== TOAST =====
+function showToast(msg, error=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (error?' error':'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
